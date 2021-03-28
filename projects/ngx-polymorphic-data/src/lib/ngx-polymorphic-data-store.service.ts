@@ -1,6 +1,6 @@
 import {Inject, Injectable, TemplateRef} from '@angular/core';
 import {PolymorphicData} from './polymorphic-data';
-import {NgxPolymorphicDataTemplateResolverStrategy, RESOLVER_STRATEGY} from './ngx-polymorphic-data-template-resolver-strategy';
+import {NgxPolymorphicDataTemplateResolverStrategy, RESOLVER_STRATEGY, THROW_ERROR_WHEN_TEMPLATE_NOT_FOUND} from './ngx-polymorphic-data-template-resolver-strategy';
 
 import { transform, isEqual, isObject, isEmpty } from 'lodash';
 import {NgxPolymorphicTemplateService} from './ngx-polymorphic-template.service';
@@ -21,10 +21,15 @@ export class NgxPolymorphicDataStoreService {
   private readonly definedComponents: Array<PolymorphicData<any>> = [];
 
   constructor(@Inject(RESOLVER_STRATEGY) private readonly strategy: NgxPolymorphicDataTemplateResolverStrategy,
+              @Inject(THROW_ERROR_WHEN_TEMPLATE_NOT_FOUND) private readonly throwErrorWhenTemplateNotFound: boolean,
               private readonly polymorphicTemplateService: NgxPolymorphicTemplateService) { }
 
   addComponent<T>(component: PolymorphicData<T>): void {
     this.definedComponents.push(component);
+  }
+
+  addComponents<T>(components: Array<PolymorphicData<T>>): void {
+    components.forEach(c => this.addComponent(c));
   }
 
   resolveTemplateRef(data: any): TemplateRef<any> {
@@ -38,8 +43,10 @@ export class NgxPolymorphicDataStoreService {
 
     if (this.strategy === NgxPolymorphicDataTemplateResolverStrategy.THROW_ERROR && components.length > 1) {
       throw new Error('More than one components can display data.');
-    } else if (components.length === 0) {
+    } else if (this.throwErrorWhenTemplateNotFound && components.length === 0) {
       throw new Error('Data cannot be displayed with defined components.');
+    } else if (!this.throwErrorWhenTemplateNotFound && components.length === 0) {
+      return null;
     }
 
     return this.polymorphicTemplateService.get(components[0]);
@@ -49,9 +56,3 @@ export class NgxPolymorphicDataStoreService {
     return isEmpty(difference(selector, data));
   }
 }
-
-/*
-const a = { a: 1, c: 1, b: 1, s: [1, 2, 3], d: { x: 1 } }; // selector
-const b = { a: 1, b: 1, c: 1 };
-console.log(difference(a, b));
- */

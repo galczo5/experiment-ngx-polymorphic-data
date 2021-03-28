@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges, TemplateRef} from '@angular/core';
+import {Component, Input, OnChanges, SimpleChanges, TemplateRef} from '@angular/core';
 import {NgxPolymorphicDataStoreService} from './ngx-polymorphic-data-store.service';
 
 @Component({
@@ -7,9 +7,7 @@ import {NgxPolymorphicDataStoreService} from './ngx-polymorphic-data-store.servi
     <ng-container *ngIf="templateRef">
       <ng-container *ngTemplateOutlet="templateRef; context: getContext()"></ng-container>
     </ng-container>
-  `,
-  styles: [
-  ]
+  `
 })
 export class NgxDataComponent implements OnChanges {
 

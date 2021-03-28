@@ -6,3 +6,5 @@ export enum NgxPolymorphicDataTemplateResolverStrategy {
 }
 
 export const RESOLVER_STRATEGY = new InjectionToken('');
+
+export const THROW_ERROR_WHEN_TEMPLATE_NOT_FOUND = new InjectionToken('');

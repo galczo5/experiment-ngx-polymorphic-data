@@ -15,8 +15,10 @@ export class NgxPolymorphicTemplateService {
 
   get(polymorphicData: PolymorphicData<any>): TemplateRef<any> {
 
-    if (this.templates.has(polymorphicData.id)) {
-      return this.templates.get(polymorphicData.id);
+    const id = polymorphicData.id;
+
+    if (this.templates.has(id)) {
+      return this.templates.get(id);
     }
 
     const componentFactory = this.componentFactoryResolver.resolveComponentFactory(polymorphicData.component);
@@ -25,7 +27,12 @@ export class NgxPolymorphicTemplateService {
     componentRef.changeDetectorRef.detectChanges();
 
     const templateRef = componentRef.instance.template;
-    this.templates.set(polymorphicData.id, templateRef);
+
+    if (!templateRef) {
+      throw new Error(`NgxPolymorphicDataComponent has to contain element <ng-template #template></ng-template>`);
+    }
+
+    this.templates.set(id, templateRef);
     return templateRef;
   }
 
